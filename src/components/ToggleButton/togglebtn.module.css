@@ -1,0 +1,41 @@
+.switchCheck[type="checkbox"] {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.switchLabel {
+  cursor: pointer;
+  text-indent: -9999px;
+  width: 4em;
+  height: 2em;
+  @apply bg-slate-100;
+  display: block;
+  border-radius: 100px;
+  position: relative;
+}
+
+.switchLabel:after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  width: 1.5em;
+  height: 1.5em;
+  @apply bg-slate-900 transition-all;
+  border-radius: 90px;
+}
+
+.switchCheck:checked + .switchLabel {
+  @apply bg-slate-700;
+}
+
+.switchCheck:checked + .switchLabel:after {
+  left: calc(100% - 5px);
+  transform: translateX(-100%);
+  @apply bg-slate-200;
+}
+
+.switchLabel:active:after {
+  width: 2em;
+}
