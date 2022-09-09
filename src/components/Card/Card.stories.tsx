@@ -12,6 +12,6 @@ export const DayCard = Template.bind({})
 
 DayCard.args = {
   temperature: 35,
-  day: "MONDAY",
+  day: 0,
   code: "200",
 }

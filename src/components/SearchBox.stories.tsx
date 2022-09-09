@@ -6,4 +6,4 @@ export default {
   component: SearchBox,
 } as ComponentMeta<typeof SearchBox>
 
-export const SearchStory: ComponentStory<typeof SearchBox> = () => <SearchBox />
+export const SearchStory: ComponentStory<typeof SearchBox> = () => <SearchBox setSelectedCity={(cityWeather) => console.log(cityWeather)} />
