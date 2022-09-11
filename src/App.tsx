@@ -54,13 +54,13 @@ function App(): JSX.Element {
       <footer className="dark:text-slate-400 text-center flex flex-col">
         <span className="text-2xl flex justify-center gap-5">
           <a href="https://github.com/d3vLimpiado" target="_blank" rel="noreferrer">
-            <i className="bx bxl-github hover:text-red-600"></i>
+            <i className="bx bxl-github hover:text-sky-600"></i>
           </a>
           <a href="https://facebook.com/josh.limpiado" target="_blank" rel="noreferrer">
-            <i className="bx bxl-facebook hover:text-red-600"></i>
+            <i className="bx bxl-facebook hover:text-sky-600"></i>
           </a>
           <a href="mailto:devlimpiado@gmail.com">
-            <i className="bx bxl-gmail hover:text-red-600"></i>
+            <i className="bx bxl-gmail hover:text-sky-600"></i>
           </a>
         </span>
         <span>&copy; 2022 - Joshua Barcial Limpiado</span>

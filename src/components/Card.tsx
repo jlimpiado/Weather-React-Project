@@ -17,7 +17,7 @@ export default function Card({ temperature, day, code, index, setSelectedDay }: 
 
   return (
     <div
-      className="w-[225px] h-[250px] border-[1px] border-slate-800 dark:border-slate-200 rounded-xl p-4 flex flex-col cursor-pointer hover:scale-105 transition-transform"
+      className="w-[225px] h-[250px] border-[1px] border-slate-800 dark:border-slate-200 rounded-xl p-4 flex flex-col cursor-pointer hover:scale-105  hover:shadow-xl transition-transform"
       onClick={handleClick}
     >
       <div className="text-lg font-bold text-slate-800 dark:text-slate-200">{Days[day]}</div>

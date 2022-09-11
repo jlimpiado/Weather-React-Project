@@ -89,8 +89,9 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
       params: {
         appid: import.meta.env.VITE_WEATHER_API_KEY,
         units: "metric",
-        lat: cityObj.coordinates.latitude,
-        lon: cityObj.coordinates.longitude,
+        // lat: cityObj.coordinates.latitude,
+        // lon: cityObj.coordinates.longitude,
+        q: `${cityObj.name}, ${cityObj.country.name}`
       },
     }
 
