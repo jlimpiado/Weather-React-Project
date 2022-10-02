@@ -1,5 +1,6 @@
 import React, { ChangeEvent, MouseEvent, useEffect, useRef } from "react"
 import axios from "axios"
+import { MdClose } from "react-icons/md"
 
 type CityProps = {
   id: string
@@ -37,11 +38,14 @@ export type CityWeather = {
   name?: string
   country?: string
   weather?: Array<{
-    id?: string
-    iconId?: string
-    description?: string
-    dateForecast?: Date
-    temp?: number
+    id: string | null
+    iconId: string | null
+    description: string | null
+    dateForecast: Date | null
+    temp: number | null
+    tempMax: number | null
+    tempMin: number | null
+    humidity: number | null
   }>
 }
 
@@ -91,7 +95,7 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
         units: "metric",
         // lat: cityObj.coordinates.latitude,
         // lon: cityObj.coordinates.longitude,
-        q: `${cityObj.name}, ${cityObj.country.name}`
+        q: `${cityObj.name}, ${cityObj.country.name}`,
       },
     }
 
@@ -109,6 +113,9 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
             description: list[i]?.weather[0]?.description,
             dateForecast: new Date(list[i]?.dt * 1000),
             temp: list[i]?.main?.temp,
+            tempMax: list[i]?.main?.temp_max,
+            tempMin: list[i]?.main?.temp_min,
+            humidity: list[i]?.main?.humidity
           })
         }
         setSelectedCity(cityWeather)
@@ -125,7 +132,7 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
           <div
             id={city.id}
             key={city.id}
-            className="dark:bg-slate-800 bg-slate-200 dark:text-slate-200 text-slate-800 my-1 p-2 rounded-lg dark:hover:bg-slate-200 dark:hover:text-slate-800 hover:bg-slate-800 hover:text-slate-200 cursor-pointer"
+            className="dark:bg-slate-200 bg-slate-800 dark:text-slate-800 text-slate-200 my-1 p-2 rounded-lg dark:hover:bg-slate-300 hover:bg-slate-700 cursor-pointer"
             onClick={handleClick}
           >
             {city.name}, {city.country.id}
@@ -142,6 +149,7 @@ type SearchBoxProps = {
 export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Element {
   const [searchCity, setSearchCity] = React.useState<string>("")
   const [cityList, setCityList] = React.useState<APIResponse[]>(() => [])
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSearchCity = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchCity(event.target.value)
@@ -187,18 +195,32 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
   }, [cityList, searchCity])
 
   return (
-    <div className=" mt-4 flex flex-col items-center">
-      <div className="w-fit relative">
-        <input
-          id="dropdownInput"
-          type="text"
-          autoComplete="off"
-          placeholder="Search"
-          className="min-w-[300px] sm:min-w-[500px] text-[20px] p-3 focus:outline-none focus:ring-2 ring-slate-800 dark:ring-slate-200 ring-offset-slate-300 dark:ring-offset-slate-900 ring-offset-2 rounded-lg bg-slate-800 dark:bg-slate-200 text-slate-200 dark:text-slate-900"
-          value={searchCity}
-          onChange={handleSearchCity}
-          minLength={3}
-        />
+    <div className="flex flex-col items-center">
+      <div className="relative">
+        <div className="flex min-w-[300px] sm:min-w-[500px] p-3 rounded-full bg-slate-800 dark:bg-slate-200 text-slate-200 dark:text-slate-900 focus-within:outline outline-[1px] outline-slate-800 dark:outline-slate-200 outline-offset-2">
+          <input
+            id="dropdownInput"
+            ref={inputRef}
+            type="text"
+            autoComplete="off"
+            placeholder="Search city"
+            className="bg-transparent w-full focus:outline-none text-xl p-1"
+            value={searchCity}
+            onChange={handleSearchCity}
+            minLength={3}
+          />
+          {searchCity !== "" && (
+            <button
+              className="text-slate-400 cursor-pointer text-4xl rounded-full group focus:outline-none"
+              onClick={() => {
+                setSearchCity("")
+                inputRef.current?.focus();
+              }}
+            >
+              <MdClose className="group-focus:fill-slate-200 dark:group-focus:fill-slate-800 transition-all " />
+            </button>
+          )}
+        </div>
         <Dropdown
           items={cityList}
           setSearchInput={(cityObj) => {

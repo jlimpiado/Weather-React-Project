@@ -22,7 +22,7 @@ export default function Card({ temperature, day, code, index, setSelectedDay }: 
     >
       <div className="text-lg font-bold text-slate-800 dark:text-slate-200">{Days[day]}</div>
       <div className="text-center my-auto">
-        <i className={`wi wi-owm-${code} text-slate-800 dark:text-slate-200 text-8xl`}></i>
+        <i className={`wi wi-owm-${code} text-slate-800 dark:text-slate-200 text-7xl`}></i>
       </div>
       <div
         className={`text-4xl sm:text-6xl text-center ${

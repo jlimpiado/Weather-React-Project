@@ -10,7 +10,7 @@ export default function ToggleButton(): JSX.Element {
   }
 
   return (
-    <div className="absolute right-1 top-0">
+    <span>
       <input
         type="checkbox"
         id="togglebtn"
@@ -19,6 +19,6 @@ export default function ToggleButton(): JSX.Element {
         defaultChecked
       />
       <label htmlFor="togglebtn" className={style.switchLabel} />
-    </div>
+    </span>
   )
 }
