@@ -35,7 +35,7 @@ function App(): JSX.Element {
                 humidity: selectedCity.weather[selectedDay]?.humidity,
               }}
             />
-            <div className="flex overflow-auto gap-4 p-2 mt-4 sm:justify-center">
+            <div className="flex overflow-auto gap-4 p-2 mt-4 w-screen sm:w-full sm:justify-center">
               {selectedCity.weather.map((weather, index) => (
                 <Card
                   code={weather.iconId || ""}
