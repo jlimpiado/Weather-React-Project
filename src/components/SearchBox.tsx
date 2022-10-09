@@ -1,92 +1,97 @@
-import React, { ChangeEvent, MouseEvent, useEffect, useRef } from "react"
-import axios from "axios"
-import { MdClose } from "react-icons/md"
+import React, { ChangeEvent, MouseEvent, useEffect, useRef } from "react";
+import axios from "axios";
+import { MdClose } from "react-icons/md";
+import { AppContext, type AppContextProps } from "../App";
+import Loader from "./Loader";
 
 type CityProps = {
-  id: string
-  geonameId: number
-  name: string
-}
+  id: string;
+  geonameId: number;
+  name: string;
+};
 
 type APIResponse = {
-  id: string
-  geonameId: number
-  type: string
-  name: string
-  population: number
-  elevation: number
-  timezoneId: string
-  country: CityProps
-  adminDivision1: CityProps
-  adminDivision2: CityProps
-  score: number
+  id: string;
+  geonameId: number;
+  type: string;
+  name: string;
+  population: number;
+  elevation: number;
+  timezoneId: string;
+  country: CityProps;
+  adminDivision1: CityProps;
+  adminDivision2: CityProps;
+  score: number;
   coordinates: {
-    latitude: number
-    longitude: number
-  }
-}
+    latitude: number;
+    longitude: number;
+  };
+};
 
 const useDebounce = (effect: React.EffectCallback, delay: number, deps?: React.DependencyList) => {
   React.useEffect(() => {
-    const handler = setTimeout(effect, delay)
+    const handler = setTimeout(effect, delay);
 
-    return () => clearTimeout(handler)
-  }, [...(deps || []), delay])
-}
+    return () => clearTimeout(handler);
+  }, [...(deps || []), delay]);
+};
 
 export type CityWeather = {
-  name?: string
-  country?: string
+  name?: string;
+  country?: string;
   weather?: Array<{
-    id: string | null
-    iconId: string | null
-    description: string | null
-    dateForecast: Date | null
-    temp: number | null
-    tempMax: number | null
-    tempMin: number | null
-    humidity: number | null
-  }>
-}
+    id: string | null;
+    iconId: string | null;
+    description: string | null;
+    dateForecast: Date | null;
+    temp: number | null;
+    tempMax: number | null;
+    tempMin: number | null;
+    humidity: number | null;
+  }>;
+};
 
 type DropdownProps = {
-  items: APIResponse[]
-  setSearchInput(cityObj: APIResponse): void
-  setSelectedCity(cityObj: CityWeather): void
-}
+  isItemLoading: boolean
+  items: APIResponse[];
+  setSearchInput(cityObj: APIResponse): void;
+  setSelectedCity(cityObj: CityWeather): void;
+};
 
-const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => {
-  const dropdownRef = useRef<HTMLDivElement>(null)
+const Dropdown = ({ items, setSearchInput, setSelectedCity, isItemLoading }: DropdownProps) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { setIsLoading } = React.useContext(AppContext);
 
   useEffect(() => {
     const mouseClick = (evt: Event) => {
-      const evtObj = evt?.target as Element
+      const evtObj = evt?.target as Element;
       if (dropdownRef.current?.contains(evtObj))
-        dropdownRef.current !== evtObj && dropdownRef.current.classList.add("hidden")
+        dropdownRef.current !== evtObj && dropdownRef.current.classList.add("hidden");
       else if (evtObj.id === "dropdownInput") {
         dropdownRef.current?.classList.contains("hidden") &&
-          dropdownRef.current.classList.remove("hidden")
-      } else dropdownRef.current?.classList.add("hidden")
-    }
-    window.addEventListener("click", mouseClick)
-    return () => window.removeEventListener("click", mouseClick)
-  }, [])
+          dropdownRef.current.classList.remove("hidden");
+      } else dropdownRef.current?.classList.add("hidden");
+    };
+    window.addEventListener("click", mouseClick);
+    return () => window.removeEventListener("click", mouseClick);
+  }, []);
 
   React.useEffect(() => {
     const onFocus = () => {
-      dropdownRef.current?.classList.remove("hidden")
-    }
+      dropdownRef.current?.classList.remove("hidden");
+    };
 
-    const inputElem = document.getElementById("dropdownInput")
+    const inputElem = document.getElementById("dropdownInput");
 
-    inputElem?.addEventListener("focus", onFocus)
-    return () => inputElem?.removeEventListener("focus", onFocus)
-  }, [])
+    inputElem?.addEventListener("focus", onFocus);
+    return () => inputElem?.removeEventListener("focus", onFocus);
+  }, []);
 
   const handleClick = (evt: MouseEvent) => {
-    const elem = evt.target as Element
-    const cityObj = items.filter((item) => item.id === elem.id)[0]
-    setSearchInput(cityObj)
+    setIsLoading(true);
+    const elem = evt.target as Element;
+    const cityObj = items.filter((item) => item.id === elem.id)[0];
+    setSearchInput(cityObj);
     const options = {
       method: "GET",
       url: "https://api.openweathermap.org/data/2.5/forecast",
@@ -97,15 +102,15 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
         // lon: cityObj.coordinates.longitude,
         q: `${cityObj.name}, ${cityObj.country.name}`,
       },
-    }
+    };
 
     axios
       .request(options)
       .then(function ({ data: { list, city } }) {
-        const cityWeather: CityWeather = {}
-        cityWeather.name = city?.name
-        cityWeather.country = city?.country
-        cityWeather.weather = []
+        const cityWeather: CityWeather = {};
+        cityWeather.name = city?.name;
+        cityWeather.country = city?.country;
+        cityWeather.weather = [];
         for (let i = 0; i < list?.length; i += 8) {
           cityWeather.weather.push({
             id: list[i]?.dt,
@@ -115,19 +120,25 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
             temp: list[i]?.main?.temp,
             tempMax: list[i]?.main?.temp_max,
             tempMin: list[i]?.main?.temp_min,
-            humidity: list[i]?.main?.humidity
-          })
+            humidity: list[i]?.main?.humidity,
+          });
         }
-        setSelectedCity(cityWeather)
+        setSelectedCity(cityWeather);
+        setIsLoading(false);
       })
       .catch(function (error) {
-        console.error(error)
-      })
-  }
+        console.error(error);
+        setIsLoading(false);
+      });
+  };
 
   return (
     <div className="w-full max-h-80 absolute overflow-auto shadow-xl" ref={dropdownRef}>
-      {items.length !== 0 &&
+      {isItemLoading ? (
+        <div className="dark:bg-slate-200 bg-slate-800 dark:text-slate-800 text-slate-200 my-1 p-2 rounded-lg dark:hover:bg-slate-300 hover:bg-slate-700 cursor-pointer text-center">
+          <Loader isLoading={isItemLoading}/>
+        </div>
+      ):items.length !== 0 &&
         items?.map((city) => (
           <div
             id={city.id}
@@ -139,24 +150,26 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => 
           </div>
         ))}
     </div>
-  )
-}
+  );
+};
 
 type SearchBoxProps = {
-  setSelectedCity(city: CityWeather): void
-}
+  setSelectedCity(city: CityWeather): void;
+};
 
 export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Element {
-  const [searchCity, setSearchCity] = React.useState<string>("")
-  const [cityList, setCityList] = React.useState<APIResponse[]>(() => [])
+  const [searchCity, setSearchCity] = React.useState<string>("");
+  const [cityList, setCityList] = React.useState<APIResponse[]>(() => []);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSearchCity = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchCity(event.target.value)
-  }
+    setSearchCity(event.target.value);
+  };
 
   useDebounce(
     () => {
+      setIsLoading(true);
       const options = {
         method: "GET",
         url: "https://spott.p.rapidapi.com/places/autocomplete",
@@ -170,29 +183,31 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
           "X-RapidAPI-Key": "c68c4d1b07msh0850d4fc5806174p1f5d49jsndc8ce82b58ed",
           "X-RapidAPI-Host": "spott.p.rapidapi.com",
         },
-      }
+      };
 
       if (searchCity && searchCity !== "" && searchCity.length >= 3) {
         axios
           .request<APIResponse[]>(options)
           .then(function (response) {
-            setCityList(response.data)
+            setCityList(response.data);
+            setIsLoading(false);
           })
           .catch(function (error) {
-            console.error(error)
-          })
+            setIsLoading(false);
+            console.error(error);
+          });
         // setCityList(testResponse);
       }
     },
     1000,
     [searchCity],
-  )
+  );
 
   React.useEffect(() => {
     if (searchCity.length <= 2 && Array.isArray(cityList) && cityList.length !== 0) {
-      setCityList([])
+      setCityList([]);
     }
-  }, [cityList, searchCity])
+  }, [cityList, searchCity]);
 
   return (
     <div className="flex flex-col items-center">
@@ -213,7 +228,7 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
             <button
               className="text-slate-400 cursor-pointer text-4xl rounded-full group focus:outline-none"
               onClick={() => {
-                setSearchCity("")
+                setSearchCity("");
                 inputRef.current?.focus();
               }}
             >
@@ -224,11 +239,12 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
         <Dropdown
           items={cityList}
           setSearchInput={(cityObj) => {
-            setSearchCity(`${cityObj.name}, ${cityObj.country.id}`)
+            setSearchCity(`${cityObj.name}, ${cityObj.country.id}`);
           }}
+          isItemLoading={isLoading}
           setSelectedCity={setSelectedCity}
         />
       </div>
     </div>
-  )
+  );
 }
