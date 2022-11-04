@@ -1,5 +1,6 @@
 import React from "react";
-import { ToggleButton, Card, CurrentCard, SearchBox, Loader } from "./components";
+import { ToggleButton, Card, CurrentCard, SearchBox } from "./components";
+import { VscLoading } from "react-icons/vsc";
 import type { CityWeather } from "./components/SearchBox";
 
 export type AppContextProps = {
@@ -20,10 +21,10 @@ function App(): JSX.Element {
         <div className="flex items-center justify-center">
           <SearchBox setSelectedCity={setSelectedCity} />
         </div>
-        <div className="transition ease-in-out">
+        <div className="transition-all ease-in-out">
           {isLoading ? (
-            <div className="h-full flex items-center justify-center">
-              <Loader isLoading={isLoading} />
+            <div className="h-full flex items-center justify-center text-4xl text-slate-400">
+              <VscLoading className="animate-spin" />
             </div>
           ) : selectedCity?.name &&
             selectedCity?.country &&

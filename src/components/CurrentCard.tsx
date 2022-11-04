@@ -19,7 +19,7 @@ export type CurrentCardProps = {
 
 export default function CurrentCard({ cityName, weather }: CurrentCardProps): JSX.Element {
   return (
-    <div className="flex flex-col items-center sm:justify-center gap-10 text-slate-800 dark:text-slate-200">
+    <div id="currentWeatherDiv" className="flex flex-col items-center sm:justify-center gap-10 text-slate-800 dark:text-slate-200">
       <div className="text-center text-5xl tracking-widest flex flex-col font-extrabold justify-center">
         <div>{cityName?.city || "ENTER"}</div>
         <div>{cityName?.country || "CITY"}</div>

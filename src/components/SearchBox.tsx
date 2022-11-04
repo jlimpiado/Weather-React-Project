@@ -1,8 +1,8 @@
 import React, { ChangeEvent, MouseEvent, useEffect, useRef } from "react";
 import axios from "axios";
 import { MdClose } from "react-icons/md";
-import { AppContext, type AppContextProps } from "../App";
-import Loader from "./Loader";
+import { VscLoading } from "react-icons/vsc";
+import { AppContext } from "../App";
 
 type CityProps = {
   id: string;
@@ -52,13 +52,12 @@ export type CityWeather = {
 };
 
 type DropdownProps = {
-  isItemLoading: boolean
   items: APIResponse[];
   setSearchInput(cityObj: APIResponse): void;
   setSelectedCity(cityObj: CityWeather): void;
 };
 
-const Dropdown = ({ items, setSearchInput, setSelectedCity, isItemLoading }: DropdownProps) => {
+const Dropdown = ({ items, setSearchInput, setSelectedCity }: DropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { setIsLoading } = React.useContext(AppContext);
 
@@ -134,11 +133,7 @@ const Dropdown = ({ items, setSearchInput, setSelectedCity, isItemLoading }: Dro
 
   return (
     <div className="w-full max-h-80 absolute overflow-auto shadow-xl" ref={dropdownRef}>
-      {isItemLoading ? (
-        <div className="dark:bg-slate-200 bg-slate-800 dark:text-slate-800 text-slate-200 my-1 p-2 rounded-lg dark:hover:bg-slate-300 hover:bg-slate-700 cursor-pointer text-center">
-          <Loader isLoading={isItemLoading}/>
-        </div>
-      ):items.length !== 0 &&
+      {items.length !== 0 &&
         items?.map((city) => (
           <div
             id={city.id}
@@ -169,7 +164,6 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
 
   useDebounce(
     () => {
-      setIsLoading(true);
       const options = {
         method: "GET",
         url: "https://spott.p.rapidapi.com/places/autocomplete",
@@ -186,11 +180,12 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
       };
 
       if (searchCity && searchCity !== "" && searchCity.length >= 3) {
+        setIsLoading(true);
         axios
           .request<APIResponse[]>(options)
           .then(function (response) {
-            setCityList(response.data);
             setIsLoading(false);
+            setCityList(response.data);
           })
           .catch(function (error) {
             setIsLoading(false);
@@ -212,7 +207,7 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
   return (
     <div className="flex flex-col items-center">
       <div className="relative">
-        <div className="flex min-w-[300px] sm:min-w-[500px] p-3 rounded-full bg-slate-800 dark:bg-slate-200 text-slate-200 dark:text-slate-900 focus-within:outline outline-[1px] outline-slate-800 dark:outline-slate-200 outline-offset-2">
+        <div className="relative min-w-[300px] sm:min-w-[500px] p-3 rounded-full bg-slate-800 dark:bg-slate-200 text-slate-200 dark:text-slate-900 focus-within:outline outline-[1px] outline-slate-800 dark:outline-slate-200 outline-offset-2">
           <input
             id="dropdownInput"
             ref={inputRef}
@@ -224,16 +219,23 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
             onChange={handleSearchCity}
             minLength={3}
           />
-          {searchCity !== "" && (
-            <button
-              className="text-slate-400 cursor-pointer text-4xl rounded-full group focus:outline-none"
-              onClick={() => {
-                setSearchCity("");
-                inputRef.current?.focus();
-              }}
-            >
-              <MdClose className="group-focus:fill-slate-200 dark:group-focus:fill-slate-800 transition-all " />
-            </button>
+          {searchCity !== "" && !isLoading && (
+            <div className="absolute top-1/2 -translate-y-1/2 right-5 flex items-center justify-center">
+              <button
+                className="text-slate-400 cursor-pointer text-4xl rounded-full group focus:outline-none"
+                onClick={() => {
+                  setSearchCity("");
+                  inputRef.current?.focus();
+                }}
+              >
+                <MdClose className="group-focus:fill-slate-200 dark:group-focus:fill-slate-800" />
+              </button>
+            </div>
+          )}
+          {isLoading && (
+            <div className="text-slate-400 text-4xl absolute top-1/2 -translate-y-1/2 right-5">
+              <VscLoading className="animate-spin" />
+            </div>
           )}
         </div>
         <Dropdown
@@ -241,7 +243,6 @@ export default function SearchBox({ setSelectedCity }: SearchBoxProps): JSX.Elem
           setSearchInput={(cityObj) => {
             setSearchCity(`${cityObj.name}, ${cityObj.country.id}`);
           }}
-          isItemLoading={isLoading}
           setSelectedCity={setSelectedCity}
         />
       </div>
